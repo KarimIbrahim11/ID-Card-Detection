@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import dlib
+import matplotlib.pyplot as plt
 
 
 def applyOrientation(gray, img, M):
@@ -38,6 +39,8 @@ def applyOrientation(gray, img, M):
         gray = cv2.warpPerspective(gray, M, (bwidth, bheight), flags=cv2.INTER_AREA,
                                    borderMode=cv2.BORDER_CONSTANT,
                                    borderValue=(255, 255, 255))
+        # cv2.imshow("Warped: ", img)
+        # cv2.waitKey(0)
         return gray, img, M
 
 
@@ -116,7 +119,6 @@ def blur_img(gray):
     return gray
 
 
-
 def output_img(img, largest_contour):
     # Get Bounding Points the old way
     top_leftmost_point = largest_contour[np.argmin(largest_contour[:, 0, 0] + largest_contour[:, 0, 1])][0]
@@ -161,8 +163,6 @@ def detect_text_regions(im_gray, im):
     selected_boxes = non_max_suppression(bounding_boxes)
 
     return selected_boxes, bounding_boxes
-
-
 
 
 # Function for non-maximum suppression
@@ -235,4 +235,3 @@ def face_bbox(gray):
         print("No faces found :( ")
     else:
         return faces[0].left(), faces[0].top(), faces[0].width(), faces[0].height()
-
