@@ -5,43 +5,43 @@ import matplotlib.pyplot as plt
 
 
 def applyOrientation(gray, img, M):
-    if M is not None:
-        # Apply the homography to warp the image
-        temp_gray = gray.copy()
-        temp_gray = cv2.warpPerspective(temp_gray, M, (temp_gray.shape[1], temp_gray.shape[0]), flags=cv2.INTER_AREA,
-                                        borderMode=cv2.BORDER_CONSTANT, borderValue=(255, 255, 255))
+    # # Apply the homography to warp the image
+    # temp_gray = gray.copy()
+    # temp_gray = cv2.warpPerspective(temp_gray, M, (temp_gray.shape[1], temp_gray.shape[0]), flags=cv2.INTER_AREA,
+    #                                 borderMode=cv2.BORDER_CONSTANT, borderValue=(255, 255, 255))
+    #
+    # # Find the corners after the transform has been applied
+    # height, width = temp_gray.shape[:2]
+    height, width = gray.shape[:2]
+    corners = np.array([
+        [0, 0],
+        [0, height - 1],
+        [width - 1, height - 1],
+        [width - 1, 0]
+    ])
+    corners = cv2.perspectiveTransform(np.float32([corners]), M)[0]
+    # Find the bounding rectangle
+    bx, by, bwidth, bheight = cv2.boundingRect(corners)
 
-        # Find the corners after the transform has been applied
-        height, width = temp_gray.shape[:2]
-        corners = np.array([
-            [0, 0],
-            [0, height - 1],
-            [width - 1, height - 1],
-            [width - 1, 0]
-        ])
-        corners = cv2.perspectiveTransform(np.float32([corners]), M)[0]
-        # Find the bounding rectangle
-        bx, by, bwidth, bheight = cv2.boundingRect(corners)
+    if bx < 0 and by < 0:
+        translation = np.float32([[1, 0, -bx], [0, 1, -by], [0, 0, 1]])
+    elif bx < 0 <= by:
+        translation = np.float32([[1, 0, -bx], [0, 1, 0], [0, 0, 1]])
+    elif by < 0 <= bx:
+        translation = np.float32([[1, 0, 0], [0, 1, -by], [0, 0, 1]])
+    else:
+        translation = np.float32([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
-        if bx < 0 and by < 0:
-            translation = np.float32([[1, 0, -bx], [0, 1, -by], [0, 0, 1]])
-        elif bx < 0 <= by:
-            translation = np.float32([[1, 0, -bx], [0, 1, 0], [0, 0, 1]])
-        elif by < 0 <= bx:
-            translation = np.float32([[1, 0, 0], [0, 1, -by], [0, 0, 1]])
-        else:
-            translation = np.float32([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+    M = translation.dot(M)
 
-        M = translation.dot(M)
-
-        img = cv2.warpPerspective(img, M, (bwidth, bheight), flags=cv2.INTER_AREA, borderMode=cv2.BORDER_CONSTANT,
-                                  borderValue=(255, 255, 255))
-        gray = cv2.warpPerspective(gray, M, (bwidth, bheight), flags=cv2.INTER_AREA,
-                                   borderMode=cv2.BORDER_CONSTANT,
-                                   borderValue=(255, 255, 255))
-        # cv2.imshow("Warped: ", img)
-        # cv2.waitKey(0)
-        return gray, img, M
+    img = cv2.warpPerspective(img, M, (bwidth, bheight), flags=cv2.INTER_AREA, borderMode=cv2.BORDER_CONSTANT,
+                              borderValue=(255, 255, 255))
+    gray = cv2.warpPerspective(gray, M, (bwidth, bheight), flags=cv2.INTER_AREA,
+                               borderMode=cv2.BORDER_CONSTANT,
+                               borderValue=(255, 255, 255))
+    # cv2.imshow("Warped: ", img)
+    # cv2.waitKey(0)
+    return gray, img, M
 
 
 def findOrientation(gray):
@@ -79,7 +79,7 @@ def findOrientation(gray):
                        singlePointColor=None,
                        matchesMask=matchesMask,  # draw only inliers
                        flags=2)
-    img3 = cv2.drawMatches(img1, kp1, gray, kp2, good, None, **draw_params)
+    # img3 = cv2.drawMatches(img1, kp1, gray, kp2, good, None, **draw_params)
     # plt.imshow(img3, 'gray')
     # plt.title('SIFT Features Matches')
     # plt.show()
@@ -136,7 +136,6 @@ def output_img(img, largest_contour):
 
 def detect_text_regions(im_gray, im):
     ret, thresh = cv2.threshold(im_gray, 127, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C)
-    edges = cv2.Canny(im_gray, 50, 300, apertureSize=3)
     kernel3 = np.array([[0, 0, 0],
                         [1, 1, 1],
                         [0, 0, 0]], dtype=np.uint8)
