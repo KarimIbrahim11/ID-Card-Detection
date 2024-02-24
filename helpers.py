@@ -9,6 +9,8 @@ def applyOrientation(gray, img, M):
     # temp_gray = gray.copy()
     # temp_gray = cv2.warpPerspective(temp_gray, M, (temp_gray.shape[1], temp_gray.shape[0]), flags=cv2.INTER_AREA,
     #                                 borderMode=cv2.BORDER_CONSTANT, borderValue=(255, 255, 255))
+    # cv2.imshow("warped_1", temp_gray)
+    # cv2.waitKey(0)
     #
     # # Find the corners after the transform has been applied
     # height, width = temp_gray.shape[:2]
@@ -141,6 +143,8 @@ def detect_text_regions(im_gray, im):
                         [0, 0, 0]], dtype=np.uint8)
 
     thresh = cv2.dilate(thresh, kernel3, iterations=20)
+    # cv2.imshow("bin", thresh)
+    # cv2.waitKey()
     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     minArea = 1500  # nothing
     bounding_boxes = []

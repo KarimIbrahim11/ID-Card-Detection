@@ -35,8 +35,9 @@ if __name__ == '__main__':
                 if contour_bbox is not None:
                     for point in contour_bbox:
                         cv2.circle(img, point, thickness=5, color=(255, 0, 0), radius=3)
-                        # cv2.imshow("Largest Contour:", img)
-                        # cv2.waitKey(0)
+
+                    # cv2.imshow("Largest Contour:", img)
+                    # cv2.waitKey(0)
 
                     cropped_img = output_img(img, largest_contour)
                     cropped_gray = cv2.cvtColor(cropped_img, cv2.COLOR_BGR2GRAY)
